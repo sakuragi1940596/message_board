@@ -30,8 +30,9 @@ public class DestroyServlet extends HttpServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //editサーブレットにより、sessionIDを_tokenに格納しているので、それを取得している。
+
         String _token = request.getParameter("_token");
+        //editサーブレットにより、sessionIDを_tokenに格納しているので、それを取得している。
         if(_token != null && _token.equals(request.getSession().getId())) {
             EntityManager em = DBUtil.createEntityManager();
 
