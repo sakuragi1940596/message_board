@@ -35,11 +35,30 @@ public class IndexServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
 
-        List<Message> messages = em.createNamedQuery("getAllMessages", Message.class).getResultList();
+        // 開くページ数を取得（デフォルトは1ページ目）
+        int page = 1;
+        try {
+            //getparameterはstring型になるので、integer.parseIntでInteger型へ変換
+            page = Integer.parseInt(request.getParameter("page"));
+        } catch(NumberFormatException e) {}
+
+        // 最大件数と開始位置を指定してメッセージを取得
+        List<Message> messages = em.createNamedQuery("getAllMessages", Message.class)
+        //ListでMessage型の配列であるmessagee変数を宣言し、配列内に右辺で取得した値を、配列番号0から順に代入
+        //要素数-1しておかないと、配列の番号は０から始まるので、エラーが出てしまう。
+                                   .setFirstResult(15 * (page - 1))
+                                   .setMaxResults(15)
+                                   .getResultList();
+
+        // 全件数を取得
+        long messages_count = (long)em.createNamedQuery("getMessagesCount", Long.class)
+                                      .getSingleResult();
 
         em.close();
 
         request.setAttribute("messages", messages);
+        request.setAttribute("messages_count", messages_count);     // 全件数
+        request.setAttribute("page", page);
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/messages/index.jsp");
         rd.forward(request, response);

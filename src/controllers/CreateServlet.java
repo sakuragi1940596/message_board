@@ -49,8 +49,14 @@ public class CreateServlet extends HttpServlet {
             m.setCreated_at(currentTime);
             m.setUpdated_at(currentTime);
 
+            // データベースに保存
+            //em.persistで()の引数をデータベースへ登録
             em.persist(m);
+            //getTransaction.commitで、上記の登録情報を確定して保存
             em.getTransaction().commit();
+            //sessionスコープに,flushメッセージを保存しておくことで、ログイン中は常にこのメッセージが表示できるようにする
+            //ビューとなるJSPの"${flush}"部分に、下記メッセージが表示される
+            request.getSession().setAttribute("flush", "登録が完了しました。");       // ここを追記
             em.close();
 
             response.sendRedirect(request.getContextPath()+"/index");
